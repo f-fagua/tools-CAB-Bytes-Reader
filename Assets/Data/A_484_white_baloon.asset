@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b39584a2c7ef64ddb94a7b8e7015abb0, type: 3}
+  m_Name: A_484_white_baloon
+  m_EditorClassIdentifier: 
+  m_FilePath: Assets/CABs/A/CAB-21478c858c7420d60c173ae6bb7b91a9.resS
+  m_ImageName: white_baloon
+  m_Offset: 7909280
+  m_Size: 40320
+  m_Width: 112
+  m_Height: 90
