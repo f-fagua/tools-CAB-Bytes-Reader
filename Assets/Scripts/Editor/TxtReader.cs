@@ -35,15 +35,15 @@ public class TxtReader : MonoBehaviour
         
         List<string> textureData = new List<string>();
         textureData.Add("Textures:");
+
+        string[] filters = { "Text files", "txt" };
+        string filePath = EditorUtility.OpenFilePanelWithFilters("Select a file", "", filters);
         
         //Get YAML lines
-        using (StreamReader reader = new StreamReader(s_InFilePath))
+        using (StreamReader reader = new StreamReader(filePath))
         {
-            string line;
-
-            while ((line = reader.ReadLine()) != null)
+            while (reader.ReadLine() is { } line)
             {
-                
                 if ((line.Contains("ID") && line.Contains("Texture2D")))
                 {
                     Debug.Log(line);
@@ -64,10 +64,6 @@ public class TxtReader : MonoBehaviour
         }
         
         File.WriteAllLines(s_OutYAMLFilePath, textureData.ToArray());
-        
-        
-        //Get JSON Objects
-        
     }
 
     private static bool LineContainsKey(string line, out string key, bool fromYAML = false )
