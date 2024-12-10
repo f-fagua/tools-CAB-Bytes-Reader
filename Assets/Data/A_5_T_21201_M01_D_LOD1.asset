@@ -9,8 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 798b61e73f03c47b89af84978277d526, type: 3}
-  m_Name: Comparator_7
+  m_Script: {fileID: 11500000, guid: b39584a2c7ef64ddb94a7b8e7015abb0, type: 3}
+  m_Name: A_5_T_21201_M01_D_LOD1
   m_EditorClassIdentifier: 
-  m_ImageA: {fileID: 11400000, guid: f8d98a0667d364ecfa2cc1ff4dde6e34, type: 2}
-  m_ImageB: {fileID: 11400000, guid: 57c14988c807e424e8acb98fc6e7dcfa, type: 2}
+  m_FilePath: Assets/CABs/A/CAB-21478c858c7420d60c173ae6bb7b91a9.resS
+  m_ImageName: T_21201_M01_D_LOD1
+  m_Offset: 2492272
+  m_Size: 158432
+  m_Width: 512
+  m_Height: 512

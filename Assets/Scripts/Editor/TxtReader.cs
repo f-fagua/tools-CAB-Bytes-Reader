@@ -11,11 +11,6 @@ public class TxtReader : MonoBehaviour
     private static string s_ResSFilePathA = "Assets/CABs/A/CAB-21478c858c7420d60c173ae6bb7b91a9.resS";
     private static string s_ResSFilePathB = "Assets/CABs/B/CAB-21478c858c7420d60c173ae6bb7b91a9.resS";
     
-    private static string s_InFilePath = "Assets/CABs/CAB-21478c858c7420d60c173ae6bb7b91a9.txt";
-    private static string s_OutYAMLFilePath = "Assets/Data/Textures.txt";
-
-    private static string s_ImageReaderFolder = "Assets/Data/";
-    
     private static bool s_IsSerializingTextures = false;
     
     private static string s_KeyName   = "m_Name";
@@ -110,8 +105,24 @@ public class TxtReader : MonoBehaviour
 
         s_Comparators = new List<PairComparator>();
         
+        string[] filters = { "Text files", "txt" };
+        string filePath = EditorUtility.OpenFilePanelWithFilters("Select a file", "Assets/Data/YAML", filters);
+
+        Debug.Log("Here filepath: " + filePath);
+        filePath = filePath.Substring(Application.dataPath.Length - "Assets".Length);
+        var directoryName = Path.GetDirectoryName(filePath);
+        
+        if (string.IsNullOrEmpty(directoryName)) return;
+        
+        var outDirectory = Path.Combine(directoryName, "Comparators");
+        Directory.CreateDirectory(outDirectory);
+        
+        filters = new []{ "Ress files", ".resS" };
+        string resSFilePathA = EditorUtility.OpenFilePanelWithFilters("Select a file", "Assets", filters);
+        string resSFilePathB = EditorUtility.OpenFilePanelWithFilters("Select a file", "Assets", filters);
+        
         //Get YAML lines
-        using (StreamReader reader = new StreamReader(s_OutYAMLFilePath))
+        using (StreamReader reader = new StreamReader(filePath))
         {
             string line;
 
@@ -122,23 +133,22 @@ public class TxtReader : MonoBehaviour
 
             while ((line = reader.ReadLine()) != null)
             {
-                
                 if (line == "-")
                 {
                     index++;
                     if (cabReaderA != null && cabReaderB != null)
                     {
-                        CreateAsset(cabReaderA);
-                        CreateAsset(cabReaderB);
+                        CreateAsset(cabReaderA, outDirectory);
+                        CreateAsset(cabReaderB, outDirectory);
                         
-                        CreateImageComparator(cabReaderA, cabReaderB, index);
+                        CreateImageComparator(cabReaderA, cabReaderB, index, outDirectory);
                     }
                     
                     cabReaderA = ScriptableObject.CreateInstance<ImageCabReader>();
-                    cabReaderA.FilePath = s_ResSFilePathA;
+                    cabReaderA.FilePath = resSFilePathA;
                     
                     cabReaderB = ScriptableObject.CreateInstance<ImageCabReader>();
-                    cabReaderB.FilePath = s_ResSFilePathB;
+                    cabReaderB.FilePath = resSFilePathB;
                     
                     
                 }
@@ -151,12 +161,12 @@ public class TxtReader : MonoBehaviour
             
             if (cabReaderA != null && cabReaderB != null)
             {
-                CreateAsset(cabReaderA);
-                CreateAsset(cabReaderB);
+                CreateAsset(cabReaderA, outDirectory);
+                CreateAsset(cabReaderB, outDirectory);
                         
-                CreateImageComparator(cabReaderA, cabReaderB, ++index);
+                CreateImageComparator(cabReaderA, cabReaderB, ++index, outDirectory);
                 
-                CreateBundleComparator();
+                CreateBundleComparator(outDirectory);
             }
         }
     }
@@ -194,23 +204,23 @@ public class TxtReader : MonoBehaviour
         }
     }
 
-    private static void CreateAsset(ImageCabReader cabReader)
+    private static void CreateAsset(ImageCabReader cabReader, string outDirectory)
     {
-        AssetDatabase.CreateAsset(cabReader, s_ImageReaderFolder + cabReader.name + ".asset");
+        AssetDatabase.CreateAsset(cabReader, outDirectory + "/" + cabReader.name + ".asset");
         AssetDatabase.SaveAssets();
   
         EditorUtility.FocusProjectWindow();
         Selection.activeObject = cabReader;
     }
     
-    private static void CreateImageComparator(ImageCabReader cabReaderA, ImageCabReader cabReaderB, int index)
+    private static void CreateImageComparator(ImageCabReader cabReaderA, ImageCabReader cabReaderB, int index, string outDirectory)
     {
         var comparator = ScriptableObject.CreateInstance<PairComparator>();
         comparator.name = "Comparator_" + (index-1);
         comparator.ImageA = cabReaderA;
         comparator.ImageB = cabReaderB;
 
-        AssetDatabase.CreateAsset(comparator, s_ImageReaderFolder + comparator.name + ".asset");
+        AssetDatabase.CreateAsset(comparator, outDirectory + "/" + comparator.name + ".asset");
         AssetDatabase.SaveAssets();
   
         EditorUtility.FocusProjectWindow();
@@ -219,13 +229,13 @@ public class TxtReader : MonoBehaviour
         s_Comparators.Add(comparator); 
     }
 
-    private static void CreateBundleComparator()
+    private static void CreateBundleComparator(string outDirectory)
     {
         var comparator = ScriptableObject.CreateInstance<BundleComparator>();
         comparator.name = "BundleComparator";
         comparator.PairsToCheck = s_Comparators.ToArray();
 
-        AssetDatabase.CreateAsset(comparator, s_ImageReaderFolder + comparator.name + ".asset");
+        AssetDatabase.CreateAsset(comparator, outDirectory + "/" + comparator.name + ".asset");
         AssetDatabase.SaveAssets();
   
         EditorUtility.FocusProjectWindow();

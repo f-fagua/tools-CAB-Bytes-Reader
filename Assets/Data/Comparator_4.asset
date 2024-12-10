@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 798b61e73f03c47b89af84978277d526, type: 3}
   m_Name: Comparator_4
   m_EditorClassIdentifier: 
-  m_ImageA: {fileID: 11400000, guid: 2fb19fa577bd7744d9462f09e9ac9608, type: 2}
-  m_ImageB: {fileID: 11400000, guid: 1741607a4747d9547a3c16086560b484, type: 2}
+  m_ImageA: {fileID: 11400000, guid: fcab52754f2e842a99d53313fe939527, type: 2}
+  m_ImageB: {fileID: 11400000, guid: d4886140f3a2744deb030e176753ec70, type: 2}

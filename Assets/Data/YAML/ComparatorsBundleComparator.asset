@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b82cc515648e342aba480aff254efeb5, type: 3}
+  m_Name: ComparatorsBundleComparator
+  m_EditorClassIdentifier: 
+  m_PairsToCheck:
+  - {fileID: 11400000, guid: 4539433e9054f4698bb711916fdb2216, type: 2}
+  - {fileID: 11400000, guid: c6679786185f24696955a11d7ce4f103, type: 2}
+  - {fileID: 11400000, guid: f204969abaee0445bba13a584d6ece0b, type: 2}
+  - {fileID: 11400000, guid: 40e90019719a04c7b8322e5d5eafbc2f, type: 2}
+  - {fileID: 11400000, guid: ea92a43359b554a6093e01bbb7bc94af, type: 2}
+  - {fileID: 11400000, guid: 5f3ed71e4072d46a89b75835d5baef17, type: 2}
+  - {fileID: 11400000, guid: 81d51511a61204ac387ec8fc64572b12, type: 2}
