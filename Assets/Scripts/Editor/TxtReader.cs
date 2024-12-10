@@ -47,7 +47,6 @@ public class TxtReader : MonoBehaviour
                 if ((line.Contains("ID") && line.Contains("Texture2D")))
                 {
                     Debug.Log(line);
-                    //Begin texture
                     s_IsSerializingTextures = true;
                     textureData.Add("-");
                 }
@@ -57,13 +56,23 @@ public class TxtReader : MonoBehaviour
                 }
                 else if ((LineContainsKey(line, out var key)) && s_IsSerializingTextures)
                 {
-                    //TODO continuar aqui, mandar la key con el valor.
                     textureData.Add($"  {key}: {GetValue(line)}" );
                 }
             }
         }
         
-        File.WriteAllLines(s_OutYAMLFilePath, textureData.ToArray());
+        var yamlFilePath = EditorUtility.SaveFilePanel(
+            "Save your YAML file",         // Title of the dialog
+            "Assets/Data/YAML",        // Default directory
+            "TexturesYAML.txt",     // Default file name
+            "txt"                     // Default file extension
+        );
+
+        if (string.IsNullOrEmpty(yamlFilePath)) 
+            return;
+        
+        File.WriteAllLines(yamlFilePath, textureData.ToArray());
+        Debug.Log("File saved at: " + yamlFilePath);
     }
 
     private static bool LineContainsKey(string line, out string key, bool fromYAML = false )

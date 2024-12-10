@@ -1,0 +1,43 @@
+Textures:
+-
+  m_Name: "T_21201_M01_N_LOD0"
+  m_Width: 1024
+  m_Height: 1024
+  offset: 0
+  size: 1398128
+-
+  m_Name: "T_21201_M01_M_LOD1"
+  m_Width: 512
+  m_Height: 512
+  offset: 1398128
+  size: 158432
+-
+  m_Name: "T_21201_M01_M_LOD0"
+  m_Width: 1024
+  m_Height: 1024
+  offset: 1556560
+  size: 467856
+-
+  m_Name: "T_21201_M01_D_LOD0"
+  m_Width: 1024
+  m_Height: 1024
+  offset: 2024416
+  size: 467856
+-
+  m_Name: "T_21201_M01_D_LOD1"
+  m_Width: 512
+  m_Height: 512
+  offset: 2492272
+  size: 158432
+-
+  m_Name: "T_21201_M01_N_LOD1"
+  m_Width: 512
+  m_Height: 512
+  offset: 2650704
+  size: 158432
+-
+  m_Name: "T_21201_M01_M_Ramp"
+  m_Width: 256
+  m_Height: 256
+  offset: 2809136
+  size: 40096
