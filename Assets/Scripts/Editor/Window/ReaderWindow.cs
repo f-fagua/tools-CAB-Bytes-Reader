@@ -1,22 +1,19 @@
 using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 
 public class ReaderWindow : EditorWindow
 {
-    private class Item
-    {
-        public string name;
-        public int value;
+    private static string s_KeyName   = "m_Name";
+    private static string s_KeyWidth  = "m_Width";
+    private static string s_KeyHeight = "m_Height";
+    private static string s_KeyOffset = "offset";
+    private static string s_KeySize   = "size";
 
-        public Item(string name, int value)
-        {
-            this.name = name;
-            this.value = value;
-        }
-    }
-
-    private List<Item> items = new List<Item>();
+    private static string[] k_keys = new[] { s_KeyName, s_KeyWidth, s_KeyHeight, s_KeyOffset, s_KeySize };
+    
+    private List<TextureItem> items = new List<TextureItem>();
     private Vector2 scrollPosition;
 
     private float nameColumnWidth = 100f;
@@ -26,25 +23,26 @@ public class ReaderWindow : EditorWindow
     [MenuItem("Unity Support/Window/Item List")]
     public static void ShowWindow()
     {
-        GetWindow<ReaderWindow>("Item List");
+        GetWindow<ReaderWindow>("Textures List");
     }
 
     private void OnEnable()
     {
-        items.Add(new Item("Sword", 10));
-        items.Add(new Item("Shield", 15));
-        items.Add(new Item("Potion", 5));
+        items.Add(new TextureItem("Sword", 10));
+        items.Add(new TextureItem("Shield", 15));
+        items.Add(new TextureItem("Potion", 5));
     }
 
     private void OnGUI()
     {
         GUILayout.Label("Items", EditorStyles.boldLabel);
 
-        // Add buttons above the item list
+        PaintBundlePanel();
+        
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Add Item"))
         {
-            items.Add(new Item("New Item", 0));
+            items.Add(new TextureItem("New Item", 0));
         }
         if (GUILayout.Button("Remove Last Item"))
         {
@@ -61,7 +59,7 @@ public class ReaderWindow : EditorWindow
 
         // Add headers with resizable columns
         EditorGUILayout.BeginHorizontal();
-        GUILayout.Label("Name", EditorStyles.boldLabel, GUILayout.Width(nameColumnWidth));
+        GUILayout.Label("Texture Name", EditorStyles.boldLabel, GUILayout.Width(nameColumnWidth));
 
         // Resizing handle for the Name column
         ResizeColumn(ref nameColumnWidth);
@@ -88,6 +86,101 @@ public class ReaderWindow : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
+    private string m_BundleFilePath;
+    private string m_YamlFilePath;
+    
+    private void PaintBundlePanel()
+    {
+        // Add buttons above the item list
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("Bundle to Inspect:", GUILayout.MaxWidth(105));
+        GUILayout.TextField(m_BundleFilePath, GUILayout.MinWidth(360));
+        if (GUILayout.Button("Select the Bundle", GUILayout.MinWidth(150)))
+        {
+            SelectBundleFile();
+        }
+        EditorGUILayout.EndHorizontal();
+        
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("Textures YAML File at: ", GUILayout.Width(130));
+        GUILayout.TextField(m_YamlFilePath);
+        EditorGUILayout.EndHorizontal();
+    }
+
+    private void SelectBundleFile()
+    {
+        var isSerializingTextures = false;
+        
+        List<string> textureData = new List<string>();
+        textureData.Add("Textures:");
+
+        string[] filters = { "Text files", "txt" };
+        m_BundleFilePath = EditorUtility.OpenFilePanelWithFilters("Select a file", "", filters);
+        
+        //Get YAML lines
+        using (StreamReader reader = new StreamReader(m_BundleFilePath))
+        {
+            while (reader.ReadLine() is { } line)
+            {
+                if ((line.Contains("ID") && line.Contains("Texture2D")))
+                {
+                    Debug.Log(line);
+                    isSerializingTextures = true;
+                    textureData.Add("-");
+                }
+                else if ((line.Contains("ID") && !line.Contains("Texture2D")))
+                {
+                    isSerializingTextures = false;
+                }
+                else if ((LineContainsKey(line, out var key)) && isSerializingTextures)
+                {
+                    textureData.Add($"  {key}: {GetValue(line)}" );
+                }
+            }
+        }
+        
+        m_YamlFilePath = EditorUtility.SaveFilePanel(
+            "Save your YAML file",         // Title of the dialog
+            "Assets/Data/YAML",        // Default directory
+            "TexturesYAML.txt",     // Default file name
+            "txt"                     // Default file extension
+        );
+
+        if (string.IsNullOrEmpty(m_YamlFilePath)) 
+            return;
+        
+        File.WriteAllLines(m_YamlFilePath, textureData.ToArray());
+        Debug.Log("File saved at: " + m_YamlFilePath);
+    }
+
+    private static bool LineContainsKey(string line, out string key, bool fromYAML = false )
+    {
+        key = null;
+        foreach (var currentKey in k_keys)
+        {
+            if (line.Contains(currentKey))
+            {
+                if (fromYAML)
+                {
+                    key = currentKey;
+                    return true;
+                }
+                else if ((line.Contains(s_KeySize) && line.Contains("unsigned")) || !line.Contains(s_KeySize))
+                {
+                    key = currentKey;
+                    return true;    
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    private static string GetValue(string line)
+    {
+        return line.Split(' ')[1];
+    }
+    
     private void ResizeColumn(ref float columnWidth)
     {
         Rect resizeHandleRect = GUILayoutUtility.GetLastRect();
