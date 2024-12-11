@@ -38,6 +38,8 @@ public class ReaderWindow : EditorWindow
         GUILayout.Label("Items", EditorStyles.boldLabel);
 
         PaintBundlePanel();
+        PaintResSSelectors();
+        PaintComparatorPanel();
         
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Add Item"))
@@ -180,7 +182,39 @@ public class ReaderWindow : EditorWindow
     {
         return line.Split(' ')[1];
     }
+
+    private string m_ResSFileAPath;
+    private string m_ResSFileBPath;
     
+    private void PaintResSSelectors()
+    {
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("ResS File A:", GUILayout.MaxWidth(75));
+        GUILayout.TextField(m_ResSFileAPath, GUILayout.MinWidth(420));
+        
+        string[] filters = new []{ "Ress files", ".resS" };
+        
+        if (GUILayout.Button("Select the Ress File A", GUILayout.MinWidth(80)))
+        {
+            m_ResSFileAPath = EditorUtility.OpenFilePanelWithFilters("Select a file", "Assets", filters);
+        }
+        EditorGUILayout.EndHorizontal();
+        
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("ResS File B:", GUILayout.MaxWidth(75));
+        GUILayout.TextField(m_ResSFileBPath, GUILayout.MinWidth(420));
+        if (GUILayout.Button("Select the Ress File B", GUILayout.MinWidth(80)))
+        {
+            m_ResSFileBPath = EditorUtility.OpenFilePanelWithFilters("Select a file", "Assets", filters);
+        }
+        EditorGUILayout.EndHorizontal();
+    }
+
+    private void PaintComparatorPanel()
+    {
+        
+    }
+
     private void ResizeColumn(ref float columnWidth)
     {
         Rect resizeHandleRect = GUILayoutUtility.GetLastRect();
