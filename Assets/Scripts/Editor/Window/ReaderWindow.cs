@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor.AddressableAssets.Build.Layout;
 
 public class ReaderWindow : EditorWindow
 {
@@ -210,11 +211,162 @@ public class ReaderWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
+    private string m_ComparatorAssetPath;
+    
     private void PaintComparatorPanel()
     {
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("Comparator Asset:", GUILayout.MaxWidth(115));
+        GUILayout.TextField(m_ComparatorAssetPath, GUILayout.MinWidth(420));
+        if (GUILayout.Button("Create the Comparator Asset", GUILayout.MinWidth(160)))
+        {
+            CreateScriptableObjects();
+        }
+        EditorGUILayout.EndHorizontal();
         
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Compare Bundles", GUILayout.MinWidth(160)))
+        {
+            CompareBundles();
+        }
+        EditorGUILayout.EndHorizontal();
     }
 
+    public void CompareBundles()
+    {
+        var comparator = AssetDatabase.LoadAssetAtPath<BundleComparator>(m_ComparatorAssetPath);
+        
+        if (comparator != null) 
+            comparator.Compare();
+        else
+            Debug.Log("No comparator selected");
+    }
+    
+    private List<PairComparator> m_Comparators = new List<PairComparator>();
+    
+    private void CreateScriptableObjects()
+    {
+        var isSerializingTextures = false;
+
+        string filePath = m_YamlFilePath;
+        Debug.Log("Here filepath: " + filePath);
+        filePath = filePath.Substring(Application.dataPath.Length - "Assets".Length);
+        var directoryName = Path.GetDirectoryName(filePath);
+        
+        if (string.IsNullOrEmpty(directoryName)) return;
+        
+        var outDirectory = Path.Combine(directoryName, "Comparators");
+        Directory.CreateDirectory(outDirectory);
+
+        string resSFilePathA = m_ResSFileAPath;
+        string resSFilePathB = m_ResSFileBPath;
+        
+        //Get YAML lines
+        using (StreamReader reader = new StreamReader(filePath))
+        {
+            string line;
+
+            int index = 0;
+            
+            ImageCabReader cabReaderA = null;
+            ImageCabReader cabReaderB = null;
+
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (line == "-")
+                {
+                    index++;
+                    if (cabReaderA != null && cabReaderB != null)
+                    {
+                        CreateAsset(cabReaderA, outDirectory);
+                        CreateAsset(cabReaderB, outDirectory);
+                        
+                        CreateImageComparator(cabReaderA, cabReaderB, index, outDirectory);
+                    }
+                    
+                    cabReaderA = ScriptableObject.CreateInstance<ImageCabReader>();
+                    cabReaderA.FilePath = resSFilePathA;
+                    
+                    cabReaderB = ScriptableObject.CreateInstance<ImageCabReader>();
+                    cabReaderB.FilePath = resSFilePathB;
+                    
+                    
+                }
+                else if (LineContainsKey(line, out var key, true) && cabReaderA != null)
+                {
+                    SetValue(cabReaderA, key, GetValueFromYAML(line), "A", index);
+                    SetValue(cabReaderB, key, GetValueFromYAML(line), "B", index);
+                }
+            }
+            
+            if (cabReaderA != null && cabReaderB != null)
+            {
+                CreateAsset(cabReaderA, outDirectory);
+                CreateAsset(cabReaderB, outDirectory);
+                        
+                CreateImageComparator(cabReaderA, cabReaderB, ++index, outDirectory);
+                
+                CreateBundleComparator(outDirectory);
+            }
+        }
+    }
+    
+    private static string GetValueFromYAML(string line)
+    {
+        return line.Split(':')[1].Trim();
+    }
+    
+    private static void SetValue(ImageCabReader cabReader, string key, string value, string bundle, int index)
+    {
+        if (key == s_KeyName)
+        {
+            var realName =value.Substring(1, value.Length-2);
+            cabReader.name = bundle + "_" + index + "_" + realName;
+            cabReader.ImageName = realName;
+        }
+        if (key == s_KeyWidth)
+        {
+            cabReader.Width = int.Parse(value);
+        }
+        if (key == s_KeyHeight)
+        {
+            cabReader.Height = int.Parse(value);
+        }
+        if (key == s_KeyOffset)
+        {
+            cabReader.Offset = int.Parse(value);
+        }
+        if (key == s_KeySize)
+        {
+            cabReader.Size = int.Parse(value);
+        }
+    }
+    
+    private void CreateAsset(ImageCabReader cabReader, string outDirectory)
+    {
+        AssetDatabase.CreateAsset(cabReader, outDirectory + "/" + cabReader.name + ".asset");
+        AssetDatabase.SaveAssets();
+  
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = cabReader;
+    }
+    
+    private void CreateImageComparator(ImageCabReader cabReaderA, ImageCabReader cabReaderB, int index, string outDirectory)
+    {
+        var comparator = ScriptableObject.CreateInstance<PairComparator>();
+        comparator.name = "Comparator_" + (index-1);
+        comparator.ImageA = cabReaderA;
+        comparator.ImageB = cabReaderB;
+
+        AssetDatabase.CreateAsset(comparator, outDirectory + "/" + comparator.name + ".asset");
+        AssetDatabase.SaveAssets();
+  
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = comparator;
+        
+        m_Comparators.Add(comparator); 
+    }
+    
     private void ResizeColumn(ref float columnWidth)
     {
         Rect resizeHandleRect = GUILayoutUtility.GetLastRect();
@@ -245,5 +397,19 @@ public class ReaderWindow : EditorWindow
                 }
             }
         }
+    }
+    
+    private void CreateBundleComparator(string outDirectory)
+    {
+        var comparator = ScriptableObject.CreateInstance<BundleComparator>();
+        comparator.name = "BundleComparator";
+        comparator.PairsToCheck = m_Comparators.ToArray();
+
+        m_ComparatorAssetPath = outDirectory + "/" + comparator.name + ".asset";
+        AssetDatabase.CreateAsset(comparator, m_ComparatorAssetPath);
+        AssetDatabase.SaveAssets();
+  
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = comparator;
     }
 }
