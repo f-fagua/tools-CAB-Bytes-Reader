@@ -17,8 +17,12 @@ public class ReaderWindow : EditorWindow
     private List<TextureItem> items = new List<TextureItem>();
     private Vector2 scrollPosition;
 
-    private float nameColumnWidth = 100f;
-    private float valueColumnWidth = 50f;
+    private float m_NameColumnWidth = 450f;
+    private float m_WitdthColumnWidth = 60f;
+    private float m_HeightColumnWidth = 60f;
+    private float m_OffsetColumnWidth = 90f;
+    private float m_SizeColumnWidth = 75f;
+    
     private const float columnMinWidth = 50f;
 
     [MenuItem("Unity Support/Window/Item List")]
@@ -29,9 +33,9 @@ public class ReaderWindow : EditorWindow
 
     private void OnEnable()
     {
-        items.Add(new TextureItem("Sword", 10));
-        items.Add(new TextureItem("Shield", 15));
-        items.Add(new TextureItem("Potion", 5));
+        //items.Add(new TextureItem("Sword", 10));
+        //items.Add(new TextureItem("Shield", 15));
+        //items.Add(new TextureItem("Potion", 5));
     }
 
     private void OnGUI()
@@ -45,7 +49,7 @@ public class ReaderWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Add Item"))
         {
-            items.Add(new TextureItem("New Item", 0));
+            items.Add(new TextureItem("New Item", 0, 0, 0, 0));
         }
         if (GUILayout.Button("Remove Last Item"))
         {
@@ -60,20 +64,7 @@ public class ReaderWindow : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
 
-        // Add headers with resizable columns
-        EditorGUILayout.BeginHorizontal();
-        GUILayout.Label("Texture Name", EditorStyles.boldLabel, GUILayout.Width(nameColumnWidth));
-
-        // Resizing handle for the Name column
-        ResizeColumn(ref nameColumnWidth);
-
-        GUILayout.Label("Value", EditorStyles.boldLabel, GUILayout.Width(valueColumnWidth));
-
-        // Resizing handle for the Value column
-        ResizeColumn(ref valueColumnWidth);
-
-        GUILayout.FlexibleSpace();
-        EditorGUILayout.EndHorizontal();
+        PaintTableHeader();
 
         // Begin scroll view for the list of items
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
@@ -81,8 +72,11 @@ public class ReaderWindow : EditorWindow
         foreach (var item in items)
         {
             EditorGUILayout.BeginHorizontal();
-            item.name = EditorGUILayout.TextField(item.name, GUILayout.Width(nameColumnWidth));
-            item.value = EditorGUILayout.IntField(item.value, GUILayout.Width(valueColumnWidth));
+            EditorGUILayout.TextField(item.name, GUILayout.Width(m_NameColumnWidth));
+            EditorGUILayout.TextField("" + item.width, GUILayout.Width(m_WitdthColumnWidth));
+            EditorGUILayout.TextField("" + item.height, GUILayout.Width(m_HeightColumnWidth));
+            EditorGUILayout.TextField("" + item.offset, GUILayout.Width(m_OffsetColumnWidth));
+            EditorGUILayout.TextField("" + item.size, GUILayout.Width(m_SizeColumnWidth));
             EditorGUILayout.EndHorizontal();
         }
 
@@ -411,5 +405,29 @@ public class ReaderWindow : EditorWindow
   
         EditorUtility.FocusProjectWindow();
         Selection.activeObject = comparator;
+    }
+
+    private void PaintTableHeader()
+    {
+        // Add headers with resizable columns
+        EditorGUILayout.BeginHorizontal();
+        
+        GUILayout.Label("Texture Name", EditorStyles.boldLabel, GUILayout.Width(m_NameColumnWidth));
+        ResizeColumn(ref m_NameColumnWidth);
+        
+        GUILayout.Label("Witdth", EditorStyles.boldLabel, GUILayout.Width(m_WitdthColumnWidth));
+        ResizeColumn(ref m_WitdthColumnWidth);
+
+        GUILayout.Label("Height", EditorStyles.boldLabel, GUILayout.Width(m_HeightColumnWidth));
+        ResizeColumn(ref m_HeightColumnWidth);
+        
+        GUILayout.Label("Offset", EditorStyles.boldLabel, GUILayout.Width(m_OffsetColumnWidth));
+        ResizeColumn(ref m_OffsetColumnWidth);
+        
+        GUILayout.Label("Size", EditorStyles.boldLabel, GUILayout.Width(m_SizeColumnWidth));
+        ResizeColumn(ref m_SizeColumnWidth);
+        
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
     }
 }
