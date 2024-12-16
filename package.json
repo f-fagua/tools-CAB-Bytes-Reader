@@ -1,0 +1,22 @@
+{
+  "name": "com.UnitySupport.CAB-Reader",
+  "version": "1.0.1",
+  "displayName": "CAB-Reader",
+  "description": "This is an example package",
+  "unity": "2021.3",
+  "unityRelease": "1f1",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://example.com/licensing.html",
+  "dependencies": {},
+  "keywords": [
+    "AssetBundles",
+    "Diff files",
+    "Textures"
+  ],
+  "author": {
+    "name": "Felipe Fagua",
+    "email": "felipe.fagua@unity3d.com",
+    "url": "https://www.unity3d.com"
+  }
+}
