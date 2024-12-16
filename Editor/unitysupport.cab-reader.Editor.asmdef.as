@@ -1,5 +1,5 @@
 {
-    "name": "UnitySupport.CABReader",
+    "name": "unity.cabreader",
     "references": [
         "Unity.Engine",
         "Unity.Editor"
