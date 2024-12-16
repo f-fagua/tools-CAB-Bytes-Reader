@@ -15,13 +15,15 @@ public class TextureItem
 
     public int size { get; set; }
 
-    public TextureItem(string name, int width, int height, int offset, int size)
+    public int differentBytes { get; set; }
+
+    public TextureItem(string name, int width, int height, int offset, int size, int differentBytes)
     {
         this.name = name;
         this.width = width;
         this.height = height;
         this.offset = offset;
         this.size = size;
-        this.size = size;
+        this.differentBytes = differentBytes;
     }
 }

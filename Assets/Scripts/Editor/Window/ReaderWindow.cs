@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEditor.AddressableAssets.Build.Layout;
 
 public class ReaderWindow : EditorWindow
@@ -14,17 +15,21 @@ public class ReaderWindow : EditorWindow
 
     private static string[] k_keys = new[] { s_KeyName, s_KeyWidth, s_KeyHeight, s_KeyOffset, s_KeySize };
     
-    private List<TextureItem> items = new List<TextureItem>();
+    private List<TextureItem> m_TextureItems = new List<TextureItem>();
     private Vector2 scrollPosition;
 
+    private float m_AreEqualColumnWidth = 60f;
     private float m_NameColumnWidth = 450f;
     private float m_WitdthColumnWidth = 60f;
     private float m_HeightColumnWidth = 60f;
     private float m_OffsetColumnWidth = 90f;
     private float m_SizeColumnWidth = 75f;
+    private float m_DifferentBytesColumnWidth = 75f;
     
     private const float columnMinWidth = 50f;
-
+    
+    private ProcessProgress m_ProcessProgress;
+    
     [MenuItem("Unity Support/Window/Item List")]
     public static void ShowWindow()
     {
@@ -33,56 +38,85 @@ public class ReaderWindow : EditorWindow
 
     private void OnEnable()
     {
-        //items.Add(new TextureItem("Sword", 10));
-        //items.Add(new TextureItem("Shield", 15));
-        //items.Add(new TextureItem("Potion", 5));
+        m_ProcessProgress = ProcessProgress.Initializing;
     }
 
     private void OnGUI()
     {
         GUILayout.Label("Items", EditorStyles.boldLabel);
 
-        PaintBundlePanel();
-        PaintResSSelectors();
-        PaintComparatorPanel();
+        if (m_ProcessProgress.HasFlag(ProcessProgress.Initializing))
+        {
+            PaintBundlePanel();
+        }
+
+        if (m_ProcessProgress.HasFlag(ProcessProgress.HasSelectedBundle))
+        {
+            PaintResSSelectors();
+        }
+
+        if (m_ProcessProgress.HasFlag(ProcessProgress.HasSelectedResSA) &&
+            m_ProcessProgress.HasFlag(ProcessProgress.HasSelectedResSB))
+        {
+            PaintComparatorPanel();    
+        }
         
+        /*
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Add Item"))
         {
-            items.Add(new TextureItem("New Item", 0, 0, 0, 0));
+            m_TextureItems.Add(new TextureItem("New Item", 0, 0, 0, 0, 0));
         }
         if (GUILayout.Button("Remove Last Item"))
         {
-            if (items.Count > 0)
+            if (m_TextureItems.Count > 0)
             {
-                items.RemoveAt(items.Count - 1);
+                m_TextureItems.RemoveAt(m_TextureItems.Count - 1);
             }
         }
         if (GUILayout.Button("Clear All Items"))
         {
-            items.Clear();
+            m_TextureItems.Clear();
         }
         EditorGUILayout.EndHorizontal();
-
+        */
+        
         PaintTableHeader();
 
         // Begin scroll view for the list of items
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
-        foreach (var item in items)
+        foreach (var item in m_TextureItems)
         {
+            //var guiLayout = GetGui;
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.TextField(item.name, GUILayout.Width(m_NameColumnWidth));
-            EditorGUILayout.TextField("" + item.width, GUILayout.Width(m_WitdthColumnWidth));
-            EditorGUILayout.TextField("" + item.height, GUILayout.Width(m_HeightColumnWidth));
-            EditorGUILayout.TextField("" + item.offset, GUILayout.Width(m_OffsetColumnWidth));
-            EditorGUILayout.TextField("" + item.size, GUILayout.Width(m_SizeColumnWidth));
+            var areEqual = (item.differentBytes == 0);
+            EditorGUILayout.TextField("" + areEqual, GetGuiStyle(areEqual), GUILayout.Width(m_AreEqualColumnWidth));
+            EditorGUILayout.TextField(item.name, GetGuiStyle(areEqual), GUILayout.Width(m_NameColumnWidth));
+            EditorGUILayout.TextField("" + item.width, GetGuiStyle(areEqual), GUILayout.Width(m_WitdthColumnWidth));
+            EditorGUILayout.TextField("" + item.height, GetGuiStyle(areEqual), GUILayout.Width(m_HeightColumnWidth));
+            EditorGUILayout.TextField("" + item.offset, GetGuiStyle(areEqual), GUILayout.Width(m_OffsetColumnWidth));
+            EditorGUILayout.TextField("" + item.size, GetGuiStyle(areEqual), GUILayout.Width(m_SizeColumnWidth));
+            EditorGUILayout.TextField("" + item.differentBytes, GetGuiStyle(areEqual), GUILayout.Width(m_DifferentBytesColumnWidth));
+            //EditorGUILayout.TextField("" + item.differentBytes, GUILayout.Width(m_DifferentBytesColumnWidth));
             EditorGUILayout.EndHorizontal();
         }
 
         EditorGUILayout.EndScrollView();
     }
 
+    private GUIStyle GetGuiStyle(bool areEqual)
+    {
+        var textFieldStyle = new GUIStyle(GUI.skin.textField);
+        textFieldStyle.normal.textColor = Color.red;
+        //textFieldStyle. = size;
+        
+        if (areEqual)
+            textFieldStyle.normal.textColor = Color.white;
+        
+        return textFieldStyle;
+    }
+    
     private string m_BundleFilePath;
     private string m_YamlFilePath;
     
@@ -98,9 +132,19 @@ public class ReaderWindow : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
         
+        if (!string.IsNullOrEmpty(m_BundleFilePath))
+            m_ProcessProgress |= ProcessProgress.HasSelectedBundle;
+        else
+            PaintCurrentInstruction("Select the txt Bundle to Inspect (made with the bin2text tool)");
+    }
+
+    private void PaintCurrentInstruction(string message)
+    {
         EditorGUILayout.BeginHorizontal();
-        GUILayout.Label("Textures YAML File at: ", GUILayout.Width(130));
-        GUILayout.TextField(m_YamlFilePath);
+        var centeredLabelStyle = new GUIStyle(GUI.skin.label);
+        centeredLabelStyle.alignment = TextAnchor.MiddleCenter; // Center align the text
+        centeredLabelStyle.normal.textColor = Color.yellow;     // Set the text color to yellow
+        GUILayout.Label(message, centeredLabelStyle);
         EditorGUILayout.EndHorizontal();
     }
 
@@ -195,6 +239,12 @@ public class ReaderWindow : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
         
+        if (string.IsNullOrEmpty(m_ResSFileAPath))
+        {
+            PaintCurrentInstruction("Select the .resS file uncompressed with the WebExtract tool for the first bundle");
+            return;    
+        }
+        
         EditorGUILayout.BeginHorizontal();
         GUILayout.Label("ResS File B:", GUILayout.MaxWidth(75));
         GUILayout.TextField(m_ResSFileBPath, GUILayout.MinWidth(420));
@@ -203,6 +253,16 @@ public class ReaderWindow : EditorWindow
             m_ResSFileBPath = EditorUtility.OpenFilePanelWithFilters("Select a file", "Assets", filters);
         }
         EditorGUILayout.EndHorizontal();
+
+        if (string.IsNullOrEmpty(m_ResSFileBPath))
+        {
+            PaintCurrentInstruction("Select the .resS file uncompressed with the WebExtract tool for the second bundle");
+            return;    
+        }
+
+        if (string.IsNullOrEmpty(m_ResSFileAPath) || string.IsNullOrEmpty(m_ResSFileBPath)) return;
+        m_ProcessProgress |= ProcessProgress.HasSelectedResSA;
+        m_ProcessProgress |= ProcessProgress.HasSelectedResSB;
     }
 
     private string m_ComparatorAssetPath;
@@ -217,13 +277,19 @@ public class ReaderWindow : EditorWindow
             CreateScriptableObjects();
         }
         EditorGUILayout.EndHorizontal();
-        
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Compare Bundles", GUILayout.MinWidth(160)))
+
+        if (!string.IsNullOrEmpty(m_ComparatorAssetPath))
         {
-            CompareBundles();
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Compare Bundles", GUILayout.MinWidth(160)))
+            {
+                CompareBundles();
+            }
+            EditorGUILayout.EndHorizontal();    
         }
-        EditorGUILayout.EndHorizontal();
+        
+        if (string.IsNullOrEmpty(m_ComparatorAssetPath))
+            PaintCurrentInstruction("Create the asset comparators");
     }
 
     public void CompareBundles()
@@ -231,7 +297,7 @@ public class ReaderWindow : EditorWindow
         var comparator = AssetDatabase.LoadAssetAtPath<BundleComparator>(m_ComparatorAssetPath);
         
         if (comparator != null) 
-            comparator.Compare();
+            m_TextureItems = comparator.Compare();
         else
             Debug.Log("No comparator selected");
     }
@@ -240,8 +306,6 @@ public class ReaderWindow : EditorWindow
     
     private void CreateScriptableObjects()
     {
-        var isSerializingTextures = false;
-
         string filePath = m_YamlFilePath;
         Debug.Log("Here filepath: " + filePath);
         filePath = filePath.Substring(Application.dataPath.Length - "Assets".Length);
@@ -412,6 +476,9 @@ public class ReaderWindow : EditorWindow
         // Add headers with resizable columns
         EditorGUILayout.BeginHorizontal();
         
+        GUILayout.Label("Equal?", EditorStyles.boldLabel, GUILayout.Width(m_AreEqualColumnWidth));
+        ResizeColumn(ref m_AreEqualColumnWidth);
+        
         GUILayout.Label("Texture Name", EditorStyles.boldLabel, GUILayout.Width(m_NameColumnWidth));
         ResizeColumn(ref m_NameColumnWidth);
         
@@ -426,6 +493,9 @@ public class ReaderWindow : EditorWindow
         
         GUILayout.Label("Size", EditorStyles.boldLabel, GUILayout.Width(m_SizeColumnWidth));
         ResizeColumn(ref m_SizeColumnWidth);
+
+        GUILayout.Label("Different Bytes", EditorStyles.boldLabel, GUILayout.Width(m_DifferentBytesColumnWidth));
+        ResizeColumn(ref m_DifferentBytesColumnWidth);
         
         GUILayout.FlexibleSpace();
         EditorGUILayout.EndHorizontal();

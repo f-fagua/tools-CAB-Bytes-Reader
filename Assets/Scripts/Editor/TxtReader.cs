@@ -8,9 +8,6 @@ using UnityEngine;
 
 public class TxtReader : MonoBehaviour
 {
-    private static string s_ResSFilePathA = "Assets/CABs/A/CAB-21478c858c7420d60c173ae6bb7b91a9.resS";
-    private static string s_ResSFilePathB = "Assets/CABs/B/CAB-21478c858c7420d60c173ae6bb7b91a9.resS";
-    
     private static bool s_IsSerializingTextures = false;
     
     private static string s_KeyName   = "m_Name";

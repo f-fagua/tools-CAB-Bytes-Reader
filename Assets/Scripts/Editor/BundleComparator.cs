@@ -15,12 +15,25 @@ public class BundleComparator : ScriptableObject
         set => m_PairsToCheck = value;
     }
 
-    public void Compare()
+    public List<TextureItem> Compare()
     {
+        var textureItems = new List<TextureItem>();
+        
         foreach (var pair in m_PairsToCheck)
         {
             pair.Compare(out var differences);
+            var textureItem = new TextureItem(
+                pair.ImageA.ImageName,
+                pair.ImageA.Width,
+                pair.ImageA.Height,
+                pair.ImageA.Offset,
+                pair.ImageA.Size,
+                differences.Count
+                );
+            textureItems.Add(textureItem);            
         }
+        
+        return textureItems;
     }
 
 
