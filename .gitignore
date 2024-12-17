@@ -86,6 +86,8 @@ Samples~/TestProject/Temp/
 Samples~/TestProject/obj/
 Samples~/TestProject/ProjectSettings/
 Samples~/TestProject/UserSettings/
+Samples~/TestProject/Assets/Data/
+Samples~/TestProject/Assets/Data.meta
 Samples~/TestProject/Assets/StreamingAssets/
 Samples~/TestProject/Assets/StreamingAssets.meta
 Samples~/TestProject/ServerData/
