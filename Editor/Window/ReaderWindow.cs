@@ -2,8 +2,6 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
-using Unity.VisualScripting;
-using UnityEditor.AddressableAssets.Build.Layout;
 
 public class ReaderWindow : EditorWindow
 {

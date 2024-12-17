@@ -8,7 +8,8 @@
 /[Bb]uild/
 /[Bb]uilds/
 /[Ll]ogs/
-/[Uu]ser[Ss]ettings//[Dd]ata/
+/[Uu]ser[Ss]ettings/
+/[Dd]ata/
 /Data/
 /UserSettings/
 
@@ -76,3 +77,27 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+
+Samples~/TestProject
+Samples~/TestProject/.vs/
+Samples~/TestProject/Library/
+Samples~/TestProject/Temp/
+Samples~/TestProject/obj/
+Samples~/TestProject/ProjectSettings/
+Samples~/TestProject/UserSettings/
+Samples~/TestProject/Assets/StreamingAssets/
+Samples~/TestProject/Assets/StreamingAssets.meta
+Samples~/TestProject/ServerData/
+Samples~/TestProject/HostedData/
+Samples~/TestProject/Assets/Plugins*
+Samples~/TestProject/Builds
+Samples~/TestProject/build
+Samples~/TestProject/Logs/
+Samples~/TestProject/Packages/packages-lock.json
+
+# Other
+.DS_Store
+.npmrc
+build.pyc
+Samples~/TestProject/ProjectSettings/ProjectVersion.txt
