@@ -403,8 +403,8 @@ public class ReaderWindow : EditorWindow
         AssetDatabase.CreateAsset(cabReader, outDirectory + "/" + cabReader.name + ".asset");
         AssetDatabase.SaveAssets();
   
-        EditorUtility.FocusProjectWindow();
-        Selection.activeObject = cabReader;
+        //EditorUtility.FocusProjectWindow();
+        //Selection.activeObject = cabReader;
     }
     
     private void CreateImageComparator(ImageCabReader cabReaderA, ImageCabReader cabReaderB, int index, string outDirectory)
@@ -417,8 +417,8 @@ public class ReaderWindow : EditorWindow
         AssetDatabase.CreateAsset(comparator, outDirectory + "/" + comparator.name + ".asset");
         AssetDatabase.SaveAssets();
   
-        EditorUtility.FocusProjectWindow();
-        Selection.activeObject = comparator;
+        //EditorUtility.FocusProjectWindow();
+        //Selection.activeObject = comparator;
         
         m_Comparators.Add(comparator); 
     }
@@ -465,8 +465,8 @@ public class ReaderWindow : EditorWindow
         AssetDatabase.CreateAsset(comparator, m_ComparatorAssetPath);
         AssetDatabase.SaveAssets();
   
-        EditorUtility.FocusProjectWindow();
-        Selection.activeObject = comparator;
+        //EditorUtility.FocusProjectWindow();
+        //Selection.activeObject = comparator;
     }
 
     private void PaintTableHeader()
