@@ -270,9 +270,14 @@ public class ReaderWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         GUILayout.Label("Comparator Asset:", GUILayout.MaxWidth(115));
         GUILayout.TextField(m_ComparatorAssetPath, GUILayout.MinWidth(420));
-        if (GUILayout.Button("Create the Comparator Asset", GUILayout.MinWidth(160)))
+        if (GUILayout.Button("Create the Comparator Asset", GUILayout.MinWidth(90)))
         {
             CreateScriptableObjects();
+        }
+        
+        if (!string.IsNullOrEmpty(m_ComparatorAssetPath) && GUILayout.Button("Select Comparator Asset", GUILayout.MinWidth(90)))
+        {
+            SelectComparator();
         }
         EditorGUILayout.EndHorizontal();
 
@@ -467,6 +472,13 @@ public class ReaderWindow : EditorWindow
   
         //EditorUtility.FocusProjectWindow();
         //Selection.activeObject = comparator;
+    }
+
+    private void SelectComparator()
+    {
+        var comparator = AssetDatabase.LoadAssetAtPath<BundleComparator>(m_ComparatorAssetPath);
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = comparator;
     }
 
     private void PaintTableHeader()
