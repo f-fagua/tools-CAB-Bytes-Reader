@@ -37,7 +37,7 @@ public class BundleComparator : ScriptableObject
     }
 
 
-    [MenuItem("Unity Support/Compare Bundles", false, 3)]
+    //[MenuItem("Unity Support/Compare Bundles", false, 3)]
     public static void CompareBundles()
     {
         var comparator = Selection.activeObject as BundleComparator;

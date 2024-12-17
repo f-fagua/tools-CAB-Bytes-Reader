@@ -28,7 +28,7 @@ public class ReaderWindow : EditorWindow
     
     private ProcessProgress m_ProcessProgress;
     
-    [MenuItem("Unity Support/Window/Item List")]
+    [MenuItem("Window/Unity Support/Open Comparator Window")]
     public static void ShowWindow()
     {
         GetWindow<ReaderWindow>("Textures List");

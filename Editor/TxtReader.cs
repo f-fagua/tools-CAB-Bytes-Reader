@@ -20,7 +20,7 @@ public class TxtReader : MonoBehaviour
 
     private static List<PairComparator> s_Comparators = new List<PairComparator>();
     
-    [MenuItem("Unity Support/Read Txt File (create YAML file)", false, 1)]
+    //[MenuItem("Unity Support/Read Txt File (create YAML file)", false, 1)]
     public static void ReadFile()
     {
         s_IsSerializingTextures = false;
@@ -95,7 +95,7 @@ public class TxtReader : MonoBehaviour
         return line.Split(' ')[1];
     }
     
-    [MenuItem("Unity Support/Create Scriptable Objects", false, 2)]
+    //[MenuItem("Unity Support/Create Scriptable Objects", false, 2)]
     public static void CreateScriptableObjects()
     {
         s_IsSerializingTextures = false;

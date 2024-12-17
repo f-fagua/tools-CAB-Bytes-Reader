@@ -100,7 +100,7 @@ public class ImageCabReader : ScriptableObject
         return differences.Count == 0;
     }
 
-    [MenuItem("Unity Support/Create Textures", false, 4)]
+    //[MenuItem("Unity Support/Create Textures", false, 4)]
     public static void CreateTextures()
     {
         var cabReaders = Selection.objects;
